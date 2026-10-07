@@ -1,0 +1,6 @@
+import { NextRequest,NextResponse } from 'next/server';
+import { getContext } from '@/lib/context';
+import { z } from 'zod';
+import { safeError } from '@/lib/validation';
+export async function GET(request:NextRequest){try{const {client,context}=await getContext(request.nextUrl.searchParams.get('academy'));const {data,error}=await client.rpc('academy_recovery',{p_academy:context.academy.id});if(error)throw Error(error.message);return NextResponse.json(data,{headers:{'Cache-Control':'private, no-store'}});}catch(e){return NextResponse.json({error:safeError(e)},{status:403});}}
+export async function POST(request:NextRequest){try{if(request.headers.get('origin')!==request.nextUrl.origin)throw Error('Origen no permitido.');const body=await request.json();if(body.reviewed!==true)throw Error('Revisa los períodos pendientes antes de continuar.');const {client,context}=await getContext(body.academy);const {data,error}=await client.rpc('academy_resume',{p_academy:context.academy.id,p_reason:z.string().trim().min(5).max(2000).parse(body.reason),p_key:z.uuid().parse(body.key)});if(error)throw Error(error.message);return NextResponse.json(data);}catch(e){return NextResponse.json({error:safeError(e)},{status:403});}}

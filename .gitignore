@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.next-e2e/
+.env*
+!.env.example
+coverage/
+test-results/
+playwright-report/
+.supabase/
+supabase/.temp/
+*.tsbuildinfo
+next-env.d.ts
+*.log
+.local/
+config/*.local.json

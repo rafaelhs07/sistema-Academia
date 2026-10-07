@@ -2,7 +2,7 @@
 
 Administración interna de academias con Next.js, TypeScript y Supabase. Los once módulos comparten operaciones transaccionales en PostgreSQL, permisos por academia/sucursal y archivos privados. La primera instalación usa la configuración de Renegades en Nicaragua: NIO y America/Managua.
 
-El acceso real del propietario todavía requiere la clave secreta de servidor, la invitación de Auth y completar el asistente con sucursal, caja y precios reales. No se ha publicado producción. Consulta [resultados y límites de verificación](docs/pruebas.md) y [matriz de requisitos](docs/requisitos.md).
+Incluye un panel independiente de Superadministrador con MFA obligatorio, negocios, planes comerciales, suscripciones, pagos manuales y suspensión central. El acceso real requiere nombrar al primer administrador, configurar Auth/SMTP y completar la configuración operativa con datos reales. Consulta el [manual de plataforma](docs/superadmin.md) y sus [52 pruebas de base y 12 recorridos de navegador](docs/superadmin-pruebas.md). No se ha publicado producción. Consulta [resultados y límites de verificación](docs/pruebas.md) y [matriz de requisitos](docs/requisitos.md).
 
 ## Inicio local
 
@@ -19,7 +19,7 @@ Abre http://localhost:3000. La aplicación no permite autorregistro ni tiene una
 
 ## Base de datos y propietario
 
-Las migraciones de `supabase/migrations` son la fuente de instalación y se aplican en orden. No se ejecutan al compilar. En el proyecto Supabase vinculado se aplicaron las nueve migraciones durante la construcción; el historial local coincide con el remoto. Los detalles están en `docs/pruebas.md`.
+Las migraciones de `supabase/migrations` son la fuente de instalación y se aplican en orden. No se ejecutan al compilar. En el proyecto Supabase vinculado se aplicaron las trece migraciones durante la construcción; el historial local coincide con el remoto. Los detalles están en `docs/pruebas.md`.
 
 ```powershell
 npx supabase --help
@@ -50,7 +50,7 @@ npm run test:e2e
 npm run build
 ```
 
-Las pruebas de PostgreSQL embebido instalan las migraciones completas desde cero e incluyen dos academias ficticias. `TEST_DATABASE_URL` habilita pruebas de concurrencia con conexiones PostgreSQL independientes y solo admite una base local cuyo nombre empiece por `academia_test`. Usa una base nueva para cada ejecución; estas pruebas instalan esquemas propios. GitHub Actions proporciona PostgreSQL 17 y ejecuta todos los comandos anteriores. Las pruebas del navegador usan un adaptador exclusivo de pruebas: PostgreSQL, permisos y RLS son reales; Auth se simula. No verifican entrega de correo ni Storage alojado.
+Las pruebas de PostgreSQL embebido instalan las migraciones completas desde cero e incluyen dos academias ficticias. `TEST_DATABASE_URL` habilita pruebas de concurrencia con conexiones PostgreSQL independientes y solo admite una base local cuyo nombre empiece por `academia_test`. Usa una base nueva para cada ejecución; estas pruebas instalan esquemas propios. GitHub Actions proporciona PostgreSQL 17 y ejecuta todos los comandos anteriores. Las pruebas del navegador usan un adaptador exclusivo de pruebas: PostgreSQL, permisos y RLS son reales; Auth se simula. Auth, TOTP y transporte de archivos se simulan únicamente en el adaptador; no verifican entrega de correo ni Storage alojado.
 
 ## Demostración aislada
 
@@ -74,6 +74,9 @@ Los saldos se derivan de movimientos. Los clientes no pueden escribir directamen
 
 ## Guías
 
+- [Manual de Superadministrador](docs/superadmin.md)
+- [Evidencia de plataforma](docs/superadmin-pruebas.md)
+- [Solicitud de Superadministrador](docs/requisitos-superadmin-originales.md)
 - [Vercel, variables y entornos](docs/despliegue.md)
 - [Manual para propietario y recepción](docs/manual.md)
 - [Roles y permisos](docs/roles.md)
