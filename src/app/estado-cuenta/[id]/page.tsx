@@ -1,0 +1,13 @@
+import { redirect,notFound } from 'next/navigation';
+import { getContext,requirePermission } from '@/lib/context';
+import { uuid } from '@/lib/validation';
+import { formatMoney } from '@/lib/money';
+import Decimal from 'decimal.js';
+import { PrintButton } from '@/components/print-button';
+export const dynamic='force-dynamic';
+export default async function Statement({params,searchParams}:{params:Promise<{id:string}>;searchParams:Promise<{academy?:string}>}){
+ let ctx;try{ctx=await getContext((await searchParams).academy);requirePermission(ctx.context,'billing.read');}catch{redirect('/login');}
+ const {client,context}=ctx;const id=uuid.parse((await params).id);const student=await client.from('students').select('name,joined_on,status').eq('id',id).eq('academy_id',context.academy.id).single();if(student.error)notFound();
+ const [charges,payments]=await Promise.all([client.from('charge_balances').select('*').eq('student_id',id).eq('academy_id',context.academy.id).order('due_on'),client.from('payments').select('*').eq('student_id',id).eq('academy_id',context.academy.id).order('created_at')]);if(charges.error||payments.error)throw Error('No se pudo consultar el estado de cuenta.');
+ return <main className="receipt-page"><header className="receipt-header"><div><span className="eyebrow">ESTADO DE CUENTA</span><h1>{context.academy.name}</h1><p>{context.academy.contact}</p></div><div><strong>{student.data.name}</strong><p>{new Intl.DateTimeFormat(context.academy.locale,{dateStyle:'long',timeZone:context.academy.timezone}).format(new Date())}</p></div></header><h2>Cargos y saldo</h2><table><thead><tr><th>Vencimiento</th><th>Concepto</th><th>Emitido</th><th>Pendiente</th></tr></thead><tbody>{charges.data.map(c=><tr key={c.id}><td>{c.due_on}</td><td>{c.description}</td><td>{formatMoney(c.amount,context.academy.currency,context.academy.locale)}</td><td>{formatMoney(c.balance,context.academy.currency,context.academy.locale)}</td></tr>)}</tbody></table><div className="receipt-total">Deuda: {formatMoney(charges.data.reduce((sum,c)=>sum.plus(c.balance),new Decimal(0)).toFixed(2),context.academy.currency,context.academy.locale)}</div><h2>Pagos registrados a nombre del estudiante</h2><table><thead><tr><th>Recibo</th><th>Fecha</th><th>Estado</th><th>Importe</th></tr></thead><tbody>{payments.data.map(p=><tr key={p.id}><td>#{p.receipt_number}</td><td>{p.created_at.slice(0,10)}</td><td>{p.status}</td><td>{formatMoney(p.amount,context.academy.currency,context.academy.locale)}</td></tr>)}</tbody></table><p>Los pagos familiares registrados a nombre del responsable se reflejan en el saldo de los cargos aplicados. Las transferencias pendientes todavía no reducen la deuda.</p><PrintButton/></main>;
+}

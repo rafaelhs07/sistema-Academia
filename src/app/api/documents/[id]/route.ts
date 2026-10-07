@@ -1,0 +1,4 @@
+import { NextRequest,NextResponse } from 'next/server';
+import { getContext,requirePermission } from '@/lib/context';
+import { safeError,uuid } from '@/lib/validation';
+export async function GET(request:NextRequest,{params}:{params:Promise<{id:string}>}){try{const {client,context}=await getContext(request.nextUrl.searchParams.get('academy'));requirePermission(context,'documents.read');const {id}=await params;const doc=await client.from('documents').select('path').eq('id',uuid.parse(id)).eq('academy_id',context.academy.id).single();if(doc.error)throw Error('Documento no disponible.');const signed=await client.storage.from('academy-private').createSignedUrl(doc.data.path,60);if(signed.error)throw Error(signed.error.message);return NextResponse.redirect(signed.data.signedUrl,{headers:{'Cache-Control':'private, no-store'}});}catch(error){return NextResponse.json({error:safeError(error)},{status:400});}}

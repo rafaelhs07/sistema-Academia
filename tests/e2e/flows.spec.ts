@@ -1,0 +1,22 @@
+import { test,expect } from '@playwright/test';
+test('inicio, creación de estudiante, cobro persistido y navegación móvil',async({page},testInfo)=>{
+ await page.goto('/login');await expect(page.getByRole('heading',{name:'Entra a tu academia'})).toBeVisible();
+ await page.getByLabel('Correo electrónico').fill('owner@test.invalid');await page.getByLabel('Contraseña',{exact:true}).fill('test-only-password-123');await page.getByRole('button',{name:'Entrar a la academia'}).click();
+ await expect(page.getByRole('heading',{name:'Hola, Propietario'})).toBeVisible();await expect(page.getByRole('link',{name:/Cuentas por cobrar.*USD/})).toBeVisible();
+ await page.screenshot({path:`test-results/${testInfo.project.name}-dashboard.png`,fullPage:true});
+ if(testInfo.project.name==='mobile')await page.getByRole('button',{name:'Abrir menú'}).click();
+ await page.getByRole('link',{name:'Estudiantes',exact:true}).click();
+ await page.getByRole('button',{name:'Nuevo registro'}).click();const dialog=page.getByRole('dialog');await dialog.getByLabel('Nombre completo',{exact:true}).fill(`Estudiante ${testInfo.project.name}`);await dialog.getByLabel('Teléfono',{exact:true}).fill('8888 2222');await dialog.getByRole('button',{name:'Confirmar',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText('Operación guardada');await expect(page.getByRole('link',{name:new RegExp(`Estudiante ${testInfo.project.name}`)})).toBeVisible();await page.reload();await expect(page.getByRole('link',{name:new RegExp(`Estudiante ${testInfo.project.name}`)})).toBeVisible();
+ await page.getByRole('link',{name:'Ana Martínez'}).click();await expect(page.getByRole('heading',{name:'Ana Martínez'})).toBeVisible();await page.getByRole('tab',{name:'Cargos y deuda'}).click();await expect(page.getByRole('cell',{name:'Inicio de membresía',exact:true})).toBeVisible();
+ await page.getByRole('combobox',{name:'Elegir acción'}).selectOption('payment');const payment=page.getByRole('dialog');
+ await payment.getByRole('combobox',{name:'Estudiante',exact:true}).selectOption({label:'Ana Martínez'});
+ await payment.getByRole('combobox',{name:'Caja o cuenta',exact:true}).selectOption({label:'Caja recepción'});await payment.getByRole('combobox',{name:'Medio de pago',exact:true}).selectOption({label:'Efectivo'});await payment.getByLabel('Importe retenido',{exact:true}).fill('10.00');
+ await payment.getByRole('button',{name:'Agregar línea'}).click();const chargeOption=payment.getByRole('combobox',{name:'Cargo',exact:true}).getByRole('option',{name:/Inicio de membresía/});await expect(chargeOption).toHaveCount(1);await payment.getByRole('combobox',{name:'Cargo',exact:true}).selectOption((await chargeOption.getAttribute('value'))!);await payment.getByLabel('Importe',{exact:true}).fill('10.00');await payment.getByRole('button',{name:'Confirmar',exact:true}).click();await expect(payment).not.toBeVisible();await expect(page.getByRole('status')).toContainText('Operación guardada');
+ await page.getByRole('tab',{name:'Pagos y recibos'}).click();await expect(page.getByRole('cell',{name:/10,00.*USD/}).first()).toBeVisible();await page.reload();await expect(page.getByRole('cell',{name:/10,00.*USD/}).first()).toBeVisible();
+ await page.screenshot({path:`test-results/${testInfo.project.name}-student-payments.png`,fullPage:true});
+ const receiptLink=page.getByRole('link',{name:'Recibo',exact:true}).first();await receiptLink.scrollIntoViewIfNeeded();const [receipt]=await Promise.all([page.waitForEvent('popup',{timeout:15000}),testInfo.project.name==='mobile'?receiptLink.tap():receiptLink.click()]);await expect(receipt.getByRole('heading',{name:'Renegades pruebas'})).toBeVisible();await expect(receipt.getByRole('cell',{name:'Inicio de membresía'})).toBeVisible();await expect(receipt.getByRole('button',{name:'Imprimir o guardar PDF'})).toBeVisible();expect(await receipt.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);await receipt.screenshot({path:`test-results/${testInfo.project.name}-receipt.png`,fullPage:true});await receipt.close();
+});
+test('rechaza acceso anónimo a datos y al proceso programado',async({request,page})=>{
+ const cron=await request.get('/api/cron/billing');expect(cron.status()).toBe(401);const students=await request.get('/api/data/students');expect(students.status()).toBe(401);await page.goto('/panel/estudiantes');await expect(page).toHaveURL(/\/login$/);
+});

@@ -1,0 +1,4 @@
+import { NextRequest,NextResponse } from 'next/server';
+import { getContext,requirePermission } from '@/lib/context';
+import { uuid } from '@/lib/validation';
+export async function GET(request:NextRequest,{params}:{params:Promise<{id:string}>}){try{const {client,context}=await getContext(request.nextUrl.searchParams.get('academy'));requirePermission(context,'students.read');requirePermission(context,'documents.read');const {id}=await params;const s=await client.from('students').select('photo_path').eq('id',uuid.parse(id)).eq('academy_id',context.academy.id).single();if(s.error||!s.data.photo_path)return new NextResponse(null,{status:404});const file=await client.storage.from('academy-private').download(s.data.photo_path);if(file.error)return new NextResponse(null,{status:404});return new NextResponse(file.data,{headers:{'Content-Type':file.data.type,'Cache-Control':'private, no-store'}});}catch{return new NextResponse(null,{status:403});}}
