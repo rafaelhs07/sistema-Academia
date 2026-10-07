@@ -13,6 +13,7 @@ import { logout } from '@/app/auth/actions';
 import { RecordForm } from './record-form';
 import { ImportStudents } from './student-import';
 import { SetupWizard } from './setup-wizard';
+import { ServiceRecovery } from './service-recovery';
 import { CalendarView } from './calendar-view';
 import { StudentProfile } from './student-profile';
 type Row=Record<string,unknown>;
@@ -46,6 +47,7 @@ export function Workspace({context,moduleId,initialResource,studentId}:{context:
   <main className="workspace"><div className="page-heading"><div><span className="eyebrow">{new Intl.DateTimeFormat(context.academy.locale,{dateStyle:'long',timeZone:context.academy.timezone}).format(new Date())}</span><h1>{moduleId==='inicio'?`Hola, ${context.name.split(' ')[0]}`:section.title}</h1><p>{section.subtitle}</p></div><div className="heading-actions">{moduleId==='inicio'&&allowed(context.permissions,'billing.collect')&&<button className="btn primary" onClick={()=>openOperation('payment')}><Plus size={18}/>Registrar cobro</button>}{selected?.writable&&allowed(context.permissions,selected.permission??`${selected.domain}.write`)&&<button className="btn primary" onClick={()=>openCreate()}><Plus size={18}/>Nuevo registro</button>}{relatedOps.length>0&&<select className="action-select" aria-label="Elegir acción" value="" onChange={e=>e.target.value&&openOperation(e.target.value)}><option value="">Realizar operación…</option>{relatedOps.map(([key,op])=><option key={key} value={key}>{op.label}</option>)}</select>}</div></div>
    {message&&<div className="success dismissible" role="status">{message}<button className="icon-btn" onClick={()=>setMessage('')} aria-label="Cerrar aviso"><X size={17}/></button></div>}
    {context.branches.length===0&&<div className="notice"><strong>Configura tu primera sucursal.</strong> Continúa en Configuración, después agrega tu primera caja, medio de pago, plan y tarifa.<Link href={link('configuracion')}>Abrir configuración <ArrowUpRight size={15}/></Link></div>}
+   <ServiceRecovery context={context}/>
    {moduleId==='inicio'?<Dashboard context={context} from={from} to={to} setFrom={setFrom} setTo={setTo} revision={revision} link={link} openOperation={openOperation}/>:<>
     {moduleId==='configuracion'&&<div className="settings-banner"><div><span className="eyebrow">IDENTIDAD Y REGLAS</span><h2>{context.academy.name}</h2><p>{context.academy.currency} · {context.academy.timezone} · {context.academy.country}</p></div>{allowed(context.permissions,'settings.write')&&<button className="btn" onClick={()=>openOperation('academy_settings',context.academy)}>Editar academia</button>}{allowed(context.permissions,'users.manage')&&<InviteUser context={context} onSaved={refresh}/>}</div>}
     {moduleId==='configuracion'&&allowed(context.permissions,'settings.write')&&<SetupWizard context={context} onSaved={refresh}/>}
@@ -84,5 +86,5 @@ function InviteUser({context,onSaved}:{context:AppContext;onSaved:()=>void}){
 function UploadDocument({context,studentId,onSaved}:{context:AppContext;studentId?:string;onSaved:()=>void}){
  const [message,setMessage]=useState(''),[pending,setPending]=useState(false);
  async function upload(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const form=e.currentTarget;const body=new FormData(form);body.set('academy',context.academy.id);body.set('branch',context.branch??'all');if(studentId)body.set('student_id',studentId);setPending(true);try{const response=await fetch('/api/documents',{method:'POST',body});const data=await response.json();if(data.error)throw Error(data.error);setMessage('Documento guardado.');form.reset();onSaved();}catch(error){setMessage(String(error));}finally{setPending(false);}}
- return <section className="card upload-card"><h2>Agregar documento privado</h2><form onSubmit={upload}><label>Título<input name="title" required/></label><label>Archivo (PDF, JPG o PNG; hasta 5 MB)<input name="file" type="file" accept="application/pdf,image/jpeg,image/png" required/></label><button className="btn primary" disabled={pending}>Guardar documento</button><span role="status">{message}</span></form></section>;
+ return <section className="card upload-card"><h2>Agregar documento privado</h2><form onSubmit={upload}><label>Título<input name="title" required/></label><label>Archivo (PDF, JPG o PNG; hasta 4 MB)<input name="file" type="file" accept="application/pdf,image/jpeg,image/png" required/></label><button className="btn primary" disabled={pending}>Guardar documento</button><span role="status">{message}</span></form></section>;
 }

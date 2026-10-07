@@ -2,7 +2,7 @@
 
 ## Entornos
 
-Usa tres proyectos Supabase distintos: desarrollo, pruebas y producción. En Vercel, cada conjunto de variables debe pertenecer a su entorno. Una vista previa nunca debe recibir las credenciales de producción. `ENABLE_BILLING_CRON=false` en desarrollo y vistas previas; el endpoint además rechaza `VERCEL_ENV=preview`.
+Usa tres proyectos Supabase distintos: desarrollo, pruebas y producción. En Vercel, cada conjunto de variables debe pertenecer a su entorno. Una vista previa nunca debe recibir las credenciales de producción. `ENABLE_BILLING_CRON=false` y `ENABLE_PLATFORM_BILLING_CRON=false` en desarrollo y vistas previas; el endpoint además rechaza `VERCEL_ENV=preview`.
 
 Importa el repositorio en Vercel, elige Next.js, Node 24 y el comando `npm run build`. Aplica previamente las migraciones a la base seleccionada. Revisa `supabase db push --dry-run` y respalda antes de un cambio que afecte datos. Las migraciones aplicadas son inmutables; toda corrección se agrega en una nueva. No hay migraciones ni datos de demostración en el proceso de compilación.
 
@@ -15,6 +15,7 @@ Importa el repositorio en Vercel, elige Next.js, Node 24 y el comando `npm run b
 | `NEXT_PUBLIC_APP_URL` | URL canónica de este despliegue |
 | `SUPABASE_SECRET_KEY` | Solo servidor: invitaciones y trabajo programado; operador para bootstrap |
 | `CRON_SECRET` | Secreto aleatorio de al menos 32 caracteres |
+| `ENABLE_PLATFORM_BILLING_CRON` | `true` para generar suscripciones de plataforma; independiente de las automatizaciones operativas |
 | `ENABLE_BILLING_CRON` | `true` únicamente en el entorno donde deben generarse cargos |
 | `TEST_DATABASE_URL` | Solo pruebas: PostgreSQL local aislado `academia_test*` |
 
@@ -24,7 +25,7 @@ No configures `ACADEMIA_E2E` en Vercel: es exclusivo del servidor de pruebas. No
 
 En Supabase Auth configura Site URL y las redirect URLs exactas de `/auth/callback` para cada entorno. Deshabilita las altas públicas y los accesos anónimos. Configura un proveedor SMTP antes de usar invitaciones y recuperación en producción; verifica recepción, enlaces, caducidad y contraseña nueva con cuentas reales. El código no sustituye la configuración del proveedor. `supabase/config.toml` desactiva el signup y el seed para desarrollo local.
 
-El bucket `academy-private` admite PDF/JPEG/PNG hasta 5 MB. El servidor verifica firma del archivo y tamaño. Los enlaces de documentos duran 60 segundos; un enlace ya emitido puede seguir funcionando hasta su vencimiento aunque se desactive al usuario. Las descargas de fotografía/logotipo pasan por identidad y RLS, con caché desactivada.
+Los buckets privados admiten PDF/JPEG/PNG y conservan un techo de 5 MB en Storage. Los proxies y formularios aceptan archivos de hasta 4 MB para dejar margen dentro del límite de payload de 4,5 MB de Vercel. Consulta [los límites de funciones](https://vercel.com/docs/functions/limitations). El servidor verifica firma del archivo y tamaño. Los buckets de academia y plataforma bloquean acceso directo y generación de enlaces firmados desde sesiones del navegador. Las rutas de subida/descarga verifican identidad, estado vigente, permisos y el registro con RLS del solicitante antes de usar Storage con la clave de servidor para el objeto autorizado. Descargas de documentos, fotos y logos desactivan caché. Configura la clave de servidor también para estos proxies.
 
 ## Cargos programados
 
@@ -43,3 +44,7 @@ Antes de producción, prueba restaurar a un proyecto aislado y aplicar el códig
 Para incidentes: desactiva cron, limita temporalmente escrituras mediante los accesos internos, conserva logs y auditoría, identifica la última migración y restaura en un entorno aislado antes de cambiar producción. No borres movimientos para corregir saldos. Usa ajustes, reembolsos y reversos autorizados.
 
 La aplicación no depende del disco del servidor para archivos ni de un proceso permanente para facturación. La publicación de producción está pendiente de autorización y verificación del entorno.
+
+## Administración de plataforma
+
+Consulta [el manual de Superadministrador](superadmin.md) para el nombramiento controlado, MFA obligatorio, plantilla `token_hash`, planes, pagos y suspensión. La generación comercial continúa durante una suspensión; las automatizaciones operativas requieren revisión de recuperación después de reactivar. La suspensión automática está desactivada y exige una vista previa y confirmación. No publiques producción ni actives cron hasta revisar el entorno.

@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from 'next/server';
 import { operations } from '@/domains/catalog';
-import { getContext,requirePermission } from '@/lib/context';
+import { getContext,requirePermission,BusinessServiceError } from '@/lib/context';
 import { formSchema,safeError,uuid } from '@/lib/validation';
 export async function POST(request:NextRequest,{params}:{params:Promise<{action:string}>}) {
  try{
@@ -10,5 +10,5 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{action:
   const values=formSchema(op.fields,context.academy.timezone).parse(body.data);
   const {data,error}=await client.rpc('operate',{p_academy:context.academy.id,p_branch:context.branch,p_action:action,p_data:values,p_key:uuid.parse(body.key)});if(error)throw Error(error.message);
   return NextResponse.json(data);
- }catch(error){return NextResponse.json({error:safeError(error)},{status:400});}
+ }catch(error){return NextResponse.json({error:safeError(error)},{status:error instanceof BusinessServiceError?403:400});}
 }

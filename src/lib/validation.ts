@@ -27,6 +27,6 @@ export function safeError(error:unknown):string {
  if(/foreign key/i.test(message))return 'Un registro relacionado no está disponible en esta academia.';
  if(/duplicate key|unique constraint/i.test(message))return 'Este registro ya existe. Revisa el código o la fecha.';
  if(/check constraint/i.test(message))return 'Los datos no cumplen las reglas del registro. Revisa importes, cantidades y fechas.';
- if(/fetch failed|network|ECONN/i.test(message))return 'No se pudo conectar. Comprueba tu conexión y vuelve a intentar.';
+ if(/fetch failed|failed to fetch|network|ECONN/i.test(message))return 'No se pudo conectar. Comprueba tu conexión y vuelve a intentar.';
  return message.slice(0,300);
 }

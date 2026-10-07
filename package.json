@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "db:test": "vitest run tests/database.test.ts",
     "bootstrap": "node --env-file=.env.local scripts/bootstrap.mjs",
+    "superadmin": "node --env-file=.env.local scripts/superadmin.mjs",
     "demo": "node scripts/demo.mjs"
   },
   "repository": {

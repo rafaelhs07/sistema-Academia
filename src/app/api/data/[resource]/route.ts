@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from 'next/server';
 import { resources } from '@/domains/catalog';
-import { getContext,requirePermission } from '@/lib/context';
+import { getContext,requirePermission,BusinessServiceError } from '@/lib/context';
 import { formSchema,safeError,uuid } from '@/lib/validation';
 import { csv } from '@/lib/csv';
 import { Temporal } from '@js-temporal/polyfill';
@@ -30,7 +30,7 @@ export async function GET(request:NextRequest,{params}:{params:Promise<{resource
   if(key==='expenses'){const ids=[...new Set((data??[]).map(row=>row.category_id).filter(Boolean))];if(ids.length){const categories=await client.from('expense_categories').select('id,name').in('id',ids);names.category_id=Object.fromEntries((categories.data??[]).map(row=>[row.id,row.name]));}}
   const enriched=(data??[]).map(row=>({...row,_labels:Object.fromEntries(Object.keys(names).filter(key=>row[key]).map(key=>[key,names[key][row[key]]??'Registro de otra sección']))}));
   return NextResponse.json({rows:enriched,count:count??0},{headers:{'Cache-Control':'private, no-store'}});
- }catch(error){return NextResponse.json({error:safeError(error)},{status:String(error).includes('AUTH_REQUIRED')?401:400});}
+ }catch(error){return NextResponse.json({error:safeError(error)},{status:error instanceof BusinessServiceError?403:String(error).includes('AUTH_REQUIRED')?401:400});}
 }
 export async function POST(request:NextRequest,{params}:{params:Promise<{resource:string}>}) {
  try{
@@ -45,5 +45,5 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{resourc
   const query=body.id?client.from(table).update(payload).eq('id',uuid.parse(body.id)).eq('academy_id',context.academy.id):client.from(table).insert(payload);
   const {data,error}=await query.select('id').single();if(error)throw Error(error.message);
   return NextResponse.json({id:data.id});
- }catch(error){return NextResponse.json({error:safeError(error)},{status:400});}
+ }catch(error){return NextResponse.json({error:safeError(error)},{status:error instanceof BusinessServiceError?403:400});}
 }

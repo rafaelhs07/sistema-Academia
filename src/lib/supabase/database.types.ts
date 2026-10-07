@@ -2491,6 +2491,680 @@ export type Database = {
           },
         ]
       }
+      platform_adjustments: {
+        Row: {
+          academy_id: string
+          actor: string
+          amount: number
+          charge_id: string
+          created_at: string
+          id: string
+          reason: string
+        }
+        Insert: {
+          academy_id: string
+          actor: string
+          amount: number
+          charge_id: string
+          created_at?: string
+          id?: string
+          reason: string
+        }
+        Update: {
+          academy_id?: string
+          actor?: string
+          amount?: number
+          charge_id?: string
+          created_at?: string
+          id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_adjustments_academy_id_charge_id_fkey"
+            columns: ["academy_id", "charge_id"]
+            isOneToOne: false
+            referencedRelation: "platform_charge_balances"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_adjustments_academy_id_charge_id_fkey"
+            columns: ["academy_id", "charge_id"]
+            isOneToOne: false
+            referencedRelation: "platform_charges"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_adjustments_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+        ]
+      }
+      platform_applications: {
+        Row: {
+          academy_id: string
+          amount: number
+          charge_id: string
+          id: string
+          payment_id: string
+        }
+        Insert: {
+          academy_id: string
+          amount: number
+          charge_id: string
+          id?: string
+          payment_id: string
+        }
+        Update: {
+          academy_id?: string
+          amount?: number
+          charge_id?: string
+          id?: string
+          payment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_applications_academy_id_charge_id_fkey"
+            columns: ["academy_id", "charge_id"]
+            isOneToOne: false
+            referencedRelation: "platform_charge_balances"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_applications_academy_id_charge_id_fkey"
+            columns: ["academy_id", "charge_id"]
+            isOneToOne: false
+            referencedRelation: "platform_charges"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_applications_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+          {
+            foreignKeyName: "platform_applications_academy_id_payment_id_fkey"
+            columns: ["academy_id", "payment_id"]
+            isOneToOne: false
+            referencedRelation: "platform_payments"
+            referencedColumns: ["academy_id", "id"]
+          },
+        ]
+      }
+      platform_audit: {
+        Row: {
+          academy_id: string | null
+          action: string
+          actor: string | null
+          created_at: string
+          details: Json
+          entity_id: string | null
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          academy_id?: string | null
+          action: string
+          actor?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          academy_id?: string | null
+          action?: string
+          actor?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_audit_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+        ]
+      }
+      platform_businesses: {
+        Row: {
+          academy_id: string
+          commercial_name: string
+          contact_email: string | null
+          created_at: string
+          invitation_attempts: number
+          invitation_error: string | null
+          invitation_lease_until: string | null
+          invitation_status: string
+          invitation_token: string | null
+          invited_at: string | null
+          logo_document_id: string | null
+          owner_email: string
+          owner_name: string
+          owner_user_id: string | null
+          phone: string | null
+          responsible_name: string
+          updated_at: string
+        }
+        Insert: {
+          academy_id: string
+          commercial_name: string
+          contact_email?: string | null
+          created_at?: string
+          invitation_attempts?: number
+          invitation_error?: string | null
+          invitation_lease_until?: string | null
+          invitation_status?: string
+          invitation_token?: string | null
+          invited_at?: string | null
+          logo_document_id?: string | null
+          owner_email: string
+          owner_name: string
+          owner_user_id?: string | null
+          phone?: string | null
+          responsible_name: string
+          updated_at?: string
+        }
+        Update: {
+          academy_id?: string
+          commercial_name?: string
+          contact_email?: string | null
+          created_at?: string
+          invitation_attempts?: number
+          invitation_error?: string | null
+          invitation_lease_until?: string | null
+          invitation_status?: string
+          invitation_token?: string | null
+          invited_at?: string | null
+          logo_document_id?: string | null
+          owner_email?: string
+          owner_name?: string
+          owner_user_id?: string | null
+          phone?: string | null
+          responsible_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_businesses_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: true
+            referencedRelation: "academies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_businesses_academy_id_logo_document_id_fkey"
+            columns: ["academy_id", "logo_document_id"]
+            isOneToOne: false
+            referencedRelation: "platform_documents"
+            referencedColumns: ["academy_id", "id"]
+          },
+        ]
+      }
+      platform_charges: {
+        Row: {
+          academy_id: string
+          amount: number
+          contract_id: string
+          created_at: string
+          currency: string
+          description: string
+          due_on: string
+          id: string
+          period_on: string
+        }
+        Insert: {
+          academy_id: string
+          amount: number
+          contract_id: string
+          created_at?: string
+          currency: string
+          description: string
+          due_on: string
+          id?: string
+          period_on: string
+        }
+        Update: {
+          academy_id?: string
+          amount?: number
+          contract_id?: string
+          created_at?: string
+          currency?: string
+          description?: string
+          due_on?: string
+          id?: string
+          period_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_charges_academy_id_contract_id_fkey"
+            columns: ["academy_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "platform_contracts"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_charges_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+        ]
+      }
+      platform_contracts: {
+        Row: {
+          academy_id: string
+          actor: string | null
+          created_at: string
+          currency: string
+          cycle: string
+          effective_on: string
+          id: string
+          max_branches: number
+          max_students: number | null
+          max_users: number
+          modules: string[]
+          plan_id: string
+          plan_name: string
+          price: number
+          reason: string
+          trial_days: number
+        }
+        Insert: {
+          academy_id: string
+          actor?: string | null
+          created_at?: string
+          currency: string
+          cycle: string
+          effective_on: string
+          id?: string
+          max_branches: number
+          max_students?: number | null
+          max_users: number
+          modules: string[]
+          plan_id: string
+          plan_name: string
+          price: number
+          reason: string
+          trial_days: number
+        }
+        Update: {
+          academy_id?: string
+          actor?: string | null
+          created_at?: string
+          currency?: string
+          cycle?: string
+          effective_on?: string
+          id?: string
+          max_branches?: number
+          max_students?: number | null
+          max_users?: number
+          modules?: string[]
+          plan_id?: string
+          plan_name?: string
+          price?: number
+          reason?: string
+          trial_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_contracts_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+          {
+            foreignKeyName: "platform_contracts_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "platform_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_documents: {
+        Row: {
+          academy_id: string
+          actor: string
+          created_at: string
+          id: string
+          kind: string
+          mime_type: string
+          path: string
+          size_bytes: number
+          title: string
+        }
+        Insert: {
+          academy_id: string
+          actor: string
+          created_at?: string
+          id?: string
+          kind: string
+          mime_type: string
+          path: string
+          size_bytes: number
+          title: string
+        }
+        Update: {
+          academy_id?: string
+          actor?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          mime_type?: string
+          path?: string
+          size_bytes?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_documents_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+        ]
+      }
+      platform_job_runs: {
+        Row: {
+          error: string | null
+          finished_at: string | null
+          generated: number
+          id: string
+          remaining: boolean
+          started_at: string
+        }
+        Insert: {
+          error?: string | null
+          finished_at?: string | null
+          generated?: number
+          id?: string
+          remaining?: boolean
+          started_at?: string
+        }
+        Update: {
+          error?: string | null
+          finished_at?: string | null
+          generated?: number
+          id?: string
+          remaining?: boolean
+          started_at?: string
+        }
+        Relationships: []
+      }
+      platform_payment_methods: {
+        Row: {
+          active: boolean
+          id: string
+          kind: string
+          name: string
+          requires_verification: boolean
+        }
+        Insert: {
+          active?: boolean
+          id?: string
+          kind: string
+          name: string
+          requires_verification?: boolean
+        }
+        Update: {
+          active?: boolean
+          id?: string
+          kind?: string
+          name?: string
+          requires_verification?: boolean
+        }
+        Relationships: []
+      }
+      platform_payments: {
+        Row: {
+          academy_id: string
+          actor: string
+          amount: number
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          currency: string
+          document_id: string | null
+          id: string
+          method_id: string
+          receipt_number: number
+          reference: string | null
+          rejection_reason: string | null
+          status: string
+        }
+        Insert: {
+          academy_id: string
+          actor: string
+          amount: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          currency: string
+          document_id?: string | null
+          id?: string
+          method_id: string
+          receipt_number?: number
+          reference?: string | null
+          rejection_reason?: string | null
+          status: string
+        }
+        Update: {
+          academy_id?: string
+          actor?: string
+          amount?: number
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          currency?: string
+          document_id?: string | null
+          id?: string
+          method_id?: string
+          receipt_number?: number
+          reference?: string | null
+          rejection_reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_payments_academy_id_document_id_fkey"
+            columns: ["academy_id", "document_id"]
+            isOneToOne: false
+            referencedRelation: "platform_documents"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_payments_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+          {
+            foreignKeyName: "platform_payments_method_id_fkey"
+            columns: ["method_id"]
+            isOneToOne: false
+            referencedRelation: "platform_payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_plans: {
+        Row: {
+          active: boolean
+          created_at: string
+          currency: string
+          cycle: string
+          description: string
+          id: string
+          max_branches: number
+          max_students: number | null
+          max_users: number
+          modules: string[]
+          name: string
+          price: number
+          trial_days: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          currency: string
+          cycle: string
+          description?: string
+          id?: string
+          max_branches: number
+          max_students?: number | null
+          max_users: number
+          modules?: string[]
+          name: string
+          price: number
+          trial_days?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          cycle?: string
+          description?: string
+          id?: string
+          max_branches?: number
+          max_students?: number | null
+          max_users?: number
+          modules?: string[]
+          name?: string
+          price?: number
+          trial_days?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          automatic_suspension: boolean
+          contact: string
+          id: boolean
+          payment_instructions: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          automatic_suspension?: boolean
+          contact?: string
+          id?: boolean
+          payment_instructions?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          automatic_suspension?: boolean
+          contact?: string
+          id?: boolean
+          payment_instructions?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_subscriptions: {
+        Row: {
+          academy_id: string
+          anchor_day: number
+          automatic_suspension: boolean
+          cancelled_on: string | null
+          contract_id: string
+          customer_message: string
+          ends_on: string | null
+          extension_reason: string | null
+          extension_until: string | null
+          grace_days: number
+          internal_note: string | null
+          manual_block: boolean
+          manual_reason: string | null
+          next_charge_on: string
+          operational_paused_at: string | null
+          recovery_required: boolean
+          starts_on: string
+          status: string
+          trial_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          academy_id: string
+          anchor_day: number
+          automatic_suspension?: boolean
+          cancelled_on?: string | null
+          contract_id: string
+          customer_message?: string
+          ends_on?: string | null
+          extension_reason?: string | null
+          extension_until?: string | null
+          grace_days?: number
+          internal_note?: string | null
+          manual_block?: boolean
+          manual_reason?: string | null
+          next_charge_on: string
+          operational_paused_at?: string | null
+          recovery_required?: boolean
+          starts_on: string
+          status?: string
+          trial_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          academy_id?: string
+          anchor_day?: number
+          automatic_suspension?: boolean
+          cancelled_on?: string | null
+          contract_id?: string
+          customer_message?: string
+          ends_on?: string | null
+          extension_reason?: string | null
+          extension_until?: string | null
+          grace_days?: number
+          internal_note?: string | null
+          manual_block?: boolean
+          manual_reason?: string | null
+          next_charge_on?: string
+          operational_paused_at?: string | null
+          recovery_required?: boolean
+          starts_on?: string
+          status?: string
+          trial_until?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_subscriptions_academy_id_contract_id_fkey"
+            columns: ["academy_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "platform_contracts"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_subscriptions_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: true
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           academy_id: string
@@ -4349,6 +5023,60 @@ export type Database = {
           },
         ]
       }
+      platform_charge_balances: {
+        Row: {
+          academy_id: string | null
+          amount: number | null
+          balance: number | null
+          contract_id: string | null
+          created_at: string | null
+          currency: string | null
+          description: string | null
+          due_on: string | null
+          id: string | null
+          period_on: string | null
+        }
+        Insert: {
+          academy_id?: string | null
+          amount?: number | null
+          balance?: never
+          contract_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          due_on?: string | null
+          id?: string | null
+          period_on?: string | null
+        }
+        Update: {
+          academy_id?: string | null
+          amount?: number | null
+          balance?: never
+          contract_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          description?: string | null
+          due_on?: string | null
+          id?: string | null
+          period_on?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_charges_academy_id_contract_id_fkey"
+            columns: ["academy_id", "contract_id"]
+            isOneToOne: false
+            referencedRelation: "platform_contracts"
+            referencedColumns: ["academy_id", "id"]
+          },
+          {
+            foreignKeyName: "platform_charges_academy_id_fkey"
+            columns: ["academy_id"]
+            isOneToOne: false
+            referencedRelation: "platform_businesses"
+            referencedColumns: ["academy_id"]
+          },
+        ]
+      }
       sales_report: {
         Row: {
           academy_id: string | null
@@ -4557,6 +5285,12 @@ export type Database = {
       }
     }
     Functions: {
+      academy_recovery: { Args: { p_academy: string }; Returns: Json }
+      academy_resume: {
+        Args: { p_academy: string; p_key: string; p_reason: string }
+        Returns: Json
+      }
+      academy_service: { Args: { p_academy: string }; Returns: Json }
       bootstrap_academy: {
         Args: {
           p_country: string
@@ -4566,6 +5300,10 @@ export type Database = {
           p_timezone: string
         }
         Returns: string
+      }
+      bootstrap_superadmin: {
+        Args: { p_reason: string; p_user: string }
+        Returns: undefined
       }
       collection_breakdown: {
         Args: {
@@ -4608,7 +5346,28 @@ export type Database = {
         }
         Returns: Json
       }
+      platform_data: {
+        Args: { p_filters?: Json; p_resource: string }
+        Returns: Json
+      }
+      platform_finish_invitation: {
+        Args: {
+          p_academy: string
+          p_error?: string
+          p_status: string
+          p_token: string
+          p_user: string
+        }
+        Returns: undefined
+      }
+      platform_identity: { Args: never; Returns: Json }
+      platform_logo: { Args: { p_academy: string }; Returns: Json }
+      platform_operate: {
+        Args: { p_action: string; p_data: Json; p_key: string }
+        Returns: Json
+      }
       scheduled_billing: { Args: { p_limit?: number }; Returns: Json }
+      scheduled_platform_billing: { Args: { p_limit?: number }; Returns: Json }
     }
     Enums: {
       [_ in never]: never

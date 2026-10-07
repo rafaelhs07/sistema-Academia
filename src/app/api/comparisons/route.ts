@@ -1,7 +1,7 @@
 import { NextRequest,NextResponse } from 'next/server';
 import { Temporal } from '@js-temporal/polyfill';
 import { z } from 'zod';
-import { getContext,requirePermission } from '@/lib/context';
+import { getContext,requirePermission,BusinessServiceError } from '@/lib/context';
 import { safeError } from '@/lib/validation';
 export const dynamic='force-dynamic';
 export async function GET(request:NextRequest){try{
@@ -12,4 +12,4 @@ export async function GET(request:NextRequest){try{
  const scopes=context.branch?context.branches.filter(b=>b.id===context.branch):context.branches;
  const rows=await Promise.all(scopes.map(async branch=>{const base={p_academy:context.academy.id,p_branch:branch.id};const [current,previous]=await Promise.all([client.rpc('dashboard',{...base,p_from:from.toString(),p_to:to.toString()}),client.rpc('dashboard',{...base,p_from:previousFrom.toString(),p_to:previousTo.toString()})]);if(current.error||previous.error)throw Error(current.error?.message??previous.error?.message);return {branch:branch.name,current:current.data,previous:previous.data};}));
  return NextResponse.json({rows,previousFrom:previousFrom.toString(),previousTo:previousTo.toString()},{headers:{'Cache-Control':'private, no-store'}});
-}catch(error){return NextResponse.json({error:safeError(error)},{status:400});}}
+}catch(error){return NextResponse.json({error:safeError(error)},{status:error instanceof BusinessServiceError?403:400});}}

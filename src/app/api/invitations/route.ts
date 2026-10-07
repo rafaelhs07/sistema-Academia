@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getContext,requirePermission } from '@/lib/context';
+import { getContext,requirePermission,BusinessServiceError } from '@/lib/context';
 import { adminClient } from '@/lib/supabase/admin';
 import { safeError } from '@/lib/validation';
 export async function POST(request:NextRequest){
@@ -11,5 +11,5 @@ export async function POST(request:NextRequest){
   const {error:accessError}=await client.rpc('operate',{p_academy:context.academy.id,p_branch:context.branch,p_action:'user_access',p_key:crypto.randomUUID(),p_data:{user_id:data.user.id,name,active:false,all_branches:false,branch_ids:[],role_ids:[]}});
   if(accessError)throw Error('La invitación se envió, pero no se pudo crear la membresía. El administrador debe registrar el acceso con el ID del usuario en Supabase.');
   return NextResponse.json({id:data.user.id});
- }catch(error){return NextResponse.json({error:safeError(error)},{status:400});}
+ }catch(error){return NextResponse.json({error:safeError(error)},{status:error instanceof BusinessServiceError?403:400});}
 }

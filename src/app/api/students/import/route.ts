@@ -1,5 +1,5 @@
 import { NextRequest,NextResponse } from 'next/server';
-import { getContext,requirePermission } from '@/lib/context';
+import { getContext,requirePermission,BusinessServiceError } from '@/lib/context';
 import { importRow,previewStudents } from '@/domains/students/import';
 import { safeError,uuid } from '@/lib/validation';
 import { z } from 'zod';
@@ -12,4 +12,4 @@ export async function POST(request:NextRequest){try{
  const duplicateMode=z.enum(['skip','include']).parse(body.duplicates);const rows=lines.filter(row=>duplicateMode==='include'||!row.duplicate).map(row=>importRow.parse(row.data));
  if(!rows.length)throw Error('No hay filas nuevas que importar.');
  const result=await client.rpc('operate',{p_academy:context.academy.id,p_branch:context.branch,p_action:'import_students',p_key:uuid.parse(body.key),p_data:{rows,allow_duplicates:duplicateMode==='include'}});if(result.error)throw Error(result.error.message);return NextResponse.json(result.data);
-}catch(error){return NextResponse.json({error:safeError(error)},{status:400});}}
+}catch(error){return NextResponse.json({error:safeError(error)},{status:error instanceof BusinessServiceError?403:400});}}

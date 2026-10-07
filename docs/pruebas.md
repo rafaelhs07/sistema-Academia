@@ -1,4 +1,6 @@
-# Resultados de verificación
+# Resultados de verificación de la primera entrega
+
+La ampliación de Superadministrador tiene su [evidencia actualizada](superadmin-pruebas.md): 52 pruebas de base y 12 recorridos de navegador. Este documento conserva los resultados de la primera etapa.
 
 Fecha: 7 de octubre de 2026. Ejecución local en Windows con Node 24. Las comprobaciones corresponden a las nueve migraciones entregadas; no certifican un despliegue de producción.
 
@@ -57,7 +59,7 @@ Las [capturas de escritorio y móvil](screenshots/) contienen exclusivamente dat
 
 | Verificación | Estado y dependencia |
 |---|---|
-| Primer propietario real | Bloqueado: falta `SUPABASE_SECRET_KEY` en `.env.local`; datos acordados guardados en configuración local ignorada |
+| Primer propietario real | Pendiente de completar Auth, invitación y cuenta real; datos acordados guardados en configuración local ignorada |
 | Invitación, recuperación y sesión real de Supabase Auth | Código implementado; pendiente de usuario real, URLs de Auth y entrega de correo |
 | Archivos reales y enlaces de Storage | Políticas instaladas y aislamiento SQL probado; carga/descarga alojada pendiente de sesión real |
 | Configuración operativa inicial | Asistente implementado; pendiente de sucursal, cajas, fondos y precios reales del propietario |

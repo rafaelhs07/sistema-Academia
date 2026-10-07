@@ -1,12 +1,12 @@
 import { notFound,redirect } from 'next/navigation';
-import { getContext,requirePermission } from '@/lib/context';
+import { getContext,requirePermission,BusinessServiceError } from '@/lib/context';
 import { uuid } from '@/lib/validation';
 import { formatMoney } from '@/lib/money';
 import { PrintButton } from '@/components/print-button';
 import Decimal from 'decimal.js';
 export const dynamic='force-dynamic';
 export default async function Receipt({params,searchParams}:{params:Promise<{id:string}>;searchParams:Promise<{academy?:string}>}){
- let ctx;try{ctx=await getContext((await searchParams).academy);requirePermission(ctx.context,'billing.read');}catch{redirect('/login');}
+ let ctx;try{ctx=await getContext((await searchParams).academy);requirePermission(ctx.context,'billing.read');}catch(error){if(error instanceof BusinessServiceError)redirect(`/servicio?academy=${error.academyId}`);redirect('/login');}
  const {client,context}=ctx;const {id}=await params;const payment=await client.from('payments').select('*').eq('id',uuid.parse(id)).eq('academy_id',context.academy.id).single();if(payment.error||!payment.data)notFound();
  const p=payment.data;const [applications,student,method,branch]=await Promise.all([client.from('payment_applications').select('amount,charge_id').eq('payment_id',p.id),p.student_id?client.from('students').select('name').eq('id',p.student_id).single():Promise.resolve({data:null}),client.from('payment_methods').select('name').eq('id',p.method_id).single(),client.from('branches').select('name').eq('id',p.branch_id).single()]);
  if(applications.error||method.error||branch.error)throw Error('No se pudo cargar el recibo.');
