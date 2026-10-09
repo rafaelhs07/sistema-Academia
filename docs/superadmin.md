@@ -25,13 +25,15 @@ Para recuperación por pérdida del autenticador, un operador debe verificar la 
 
 ## Plantillas de correo
 
-Admin Auth no utiliza el intercambio PKCE de una sesión iniciada desde ese navegador. Configura la plantilla **Invite user** para verificar el hash en el callback implementado, con Site URL del entorno:
+Admin Auth no utiliza el intercambio PKCE de una sesión iniciada desde ese navegador. La plantilla estándar de Supabase también está soportada: `/auth/callback` envía el fragmento de sesión a `/auth/complete`, el navegador lo valida con Supabase, establece las cookies y abre **Define tu contraseña**. El fragmento se retira del historial; nunca se envía como parámetros de consulta. La pantalla identifica el correo cuya contraseña se va a definir.
+
+Como alternativa recomendada para SSR, configura la plantilla **Invite user** para verificar el hash directamente en el callback, con Site URL del entorno:
 
 ```html
 <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=invite&next=/auth/password">Aceptar invitación y establecer contraseña</a>
 ```
 
-Para **Reset password** puedes usar el mismo enlace con `type=recovery`. El callback acepta también `code` para flujos PKCE, limita el destino a `/auth/password` o `/panel/inicio` y rechaza enlaces vencidos. Verifica recepción y apertura desde otro navegador/dispositivo; un resultado de Admin Auth no confirma la entrega del correo. Referencias oficiales: [invitación de usuarios](https://supabase.com/docs/guides/auth/users), [MFA TOTP](https://supabase.com/docs/guides/auth/auth-mfa/totp).
+Para **Reset password** puedes usar el mismo enlace con `type=recovery`. El callback acepta también `code` para flujos PKCE, limita el destino a `/auth/password` o `/panel/inicio` y rechaza enlaces vencidos. Si ya aceptaste una invitación pero no llegaste al formulario, usa **Olvidé mi contraseña** con el correo invitado y abre el enlace nuevo; no hace falta recrear el negocio ni el usuario. Verifica recepción y apertura desde otro navegador/dispositivo; un resultado de Admin Auth no confirma la entrega del correo. Referencias oficiales: [invitación de usuarios](https://supabase.com/docs/guides/auth/users), [flujo implícito](https://supabase.com/docs/guides/auth/sessions/implicit-flow), [MFA TOTP](https://supabase.com/docs/guides/auth/auth-mfa/totp).
 
 ## Planes y condiciones
 
